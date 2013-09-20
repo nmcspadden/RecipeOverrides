@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Identifier</key>
+	<string>local.munki.Firefox</string>
+	<key>Input</key>
+	<dict>
+		<key>LOCALE</key>
+		<string>en_US</string>
+		<key>MUNKI_REPO_SUBDIR</key>
+		<string>apps/firefox</string>
+		<key>NAME</key>
+		<string>Firefox</string>
+		<key>RELEASE</key>
+		<string>latest</string>
+		<key>pkginfo</key>
+		<dict>
+			<key>blocking_applications</key>
+			<array>
+				<string>Firefox</string>
+			</array>
+			<key>catalogs</key>
+			<array>
+				<string>testing</string>
+			</array>
+			<key>description</key>
+			<string>Mozilla Firefox is a free and open source web browser.</string>
+			<key>display_name</key>
+			<string>Mozilla Firefox</string>
+			<key>name</key>
+			<string>%NAME%</string>
+			<key>postinstall_script</key>
+			<string>#!/bin/bash
+mkdir -p -m 755 /Applications/Firefox.app/Contents/MacOS/distribution/bundles/ 
+mkdir -p -m 755 /Library/Application\ Support/FirefoxCCK/
+if [ ! -L /Applications/Firefox.app/Contents/MacOS/distribution/bundles/{ec8030f7-c20a-464f-9b0e-13a3a9e97384} ];
+then
+	ln -s /Library/Application\ Support/FirefoxCCK/{ec8030f7-c20a-464f-9b0e-13a3a9e97384} /Applications/Firefox.app/Contents/MacOS/distribution/bundles/
+fi
+echo "[XRE]" &gt; /Applications/Firefox.app/Contents/MacOS/browser/override.ini
+echo "EnableProfileMigrator=0" &gt;&gt; /Applications/Firefox.app/Contents/MacOS/browser/override.ini
+			</string>
+			<key>unattended_install</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>ParentRecipe</key>
+	<string>com.github.autopkg.munki.firefox-rc-en_US</string>
+</dict>
+</plist>

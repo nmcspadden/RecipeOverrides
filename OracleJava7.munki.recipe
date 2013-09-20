@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Identifier</key>
+	<string>local.munki.OracleJava7</string>
+	<key>Input</key>
+	<dict>
+		<key>MUNKI_REPO_SUBDIR</key>
+		<string>utility</string>
+		<key>NAME</key>
+		<string>JavaOracle</string>
+		<key>pkginfo</key>
+		<dict>
+			<key>catalogs</key>
+			<array>
+				<string>testing</string>
+			</array>
+			<key>description</key>
+			<string>Java SE Runtime Environment 7 enables support for running Java-powered applets and applications.</string>
+			<key>minimum_os_version</key>
+			<string>10.7.3</string>
+			<key>name</key>
+			<string>%NAME%</string>
+			<key>postinstall_script</key>
+			<string>#!/bin/sh
+BUNDLE_PLIST="/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Enabled.plist"
+DEPLOY_VERS=$(/bin/cat "$BUNDLE_PLIST" | grep deploy | cut -d\= -f2 | cut -d\&lt; -f1)
+PROPFILE="/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/lib/deployment.properties"
+cat &gt; "$PROPFILE" &lt;&lt; EOF
+# These three settings will suppress the Sparkle updater from displaying on-demand
+# and should also suppress 'insecure' warnings from within the plugin itself
+deployment.macosx.check.update=false
+deployment.expiration.decision.suppression.$DEPLOY_VERS=true
+deployment.expiration.decision.$DEPLOY_VERS=never
+
+# Extra-draconian settings below
+# deployment.macosx.check.update.locked
+# deployment.expiration.decision.suppression.$DEPLOY_VERS.locked
+# deployment.expiration.decision.$DEPLOY_VERS.locked
+EOF
+
+# Unload the now-System-managed-instead-of-regular-user launchdaemons,
+# remove symlinks so they don't reload on restarts
+/bin/launchctl unload /Library/LaunchDaemons/com.oracle.java.Helper-Tool.plist
+/bin/launchctl unload /Library/LaunchAgents/com.oracle.java.Java-Updater.plist
+/bin/rm -f /Library/LaunchDaemons/com.oracle.java.Helper-Tool.plist
+/bin/rm -f /Library/LaunchAgents/com.oracle.java.Java-Updater.plist
+            </string>
+			<key>unattended_install</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>ParentRecipe</key>
+	<string>com.github.autopkg.munki.OracleJava7</string>
+</dict>
+</plist>
